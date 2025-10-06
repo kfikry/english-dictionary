@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini English Dictionary</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📘 Mini English Dictionary</h1>
+      <p class="lead">Search words, listen to pronunciation, and view examples.</p>
+    </header>
+
+    <div class="controls">
+      <input id="search" class="search" placeholder="Search word or example..." />
+      <button id="speakAll" class="play">🔊 Speak all</button>
+      <button id="downloadBtn" class="play">💾 Save JSON</button>
+    </div>
+
+    <div id="list" class="list"></div>
+
+    <div class="add-section">
+      <h2>Add New Word</h2>
+      <input id="wordInput" placeholder="Word" />
+      <input id="posInput" placeholder="Part of speech (noun, verb...)" />
+      <input id="pronInput" placeholder="Pronunciation (e.g., /ˈplɛzənt/)" />
+      <textarea id="defInput" placeholder="Definition"></textarea>
+      <textarea id="examplesInput" placeholder="Examples (comma-separated)"></textarea>
+      <button id="addWordBtn">➕ Add Word</button>
+    </div>
+
+    <footer>
+      Hosted with ❤️ on <a href="https://github.com" target="_blank">GitHub Pages</a>.
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
