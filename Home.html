@@ -1,0 +1,328 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+  <meta charset="utf-8" /> 
+  <meta name="viewport" content="width=device-width,initial-scale=1" /> 
+  <title>Mini English Dictionary — Pronunciation + Examples</title> 
+  <style> 
+    :root{
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#2563eb
+    } 
+    body{
+      font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      margin:0;
+      padding:28px;
+      color:#111
+    } 
+    .container{
+      max-width:900px;
+      margin:0 auto
+    } 
+    header{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px
+    } 
+    h1{
+      font-size:20px;
+      margin:0
+    } 
+    p.lead{
+      margin:0;
+      color:var(--muted)
+    }
+ 
+    .controls{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin:18px 0
+    } 
+    input.search{
+      flex:1;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #e6e9ef;
+      background:white
+    } 
+    .list{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px
+    } 
+ 
+    .card{
+      background:var(--card);
+      padding:14px;
+      border-radius:12px;
+      box-shadow:0 6px 18px rgba(16,24,40,0.06);
+      display:flex;
+      gap:12px;
+      align-items:flex-start
+    } 
+    .word{
+      width:140px;
+      flex-shrink:0
+    } 
+    .word h2{
+      margin:0;
+      font-size:18px
+    } 
+    .meta{
+      color:var(--muted);
+      font-size:13px
+    } 
+    .actions{
+      margin-top:8px;
+      display:flex;
+      gap:8px
+    } 
+    button.play{
+      background:transparent;
+      border:1px solid #e6e9ef;
+      padding:6px 8px;
+      border-radius:8px;
+      cursor:pointer
+    } 
+    .definition{
+      flex:1
+    } 
+    .example{
+      margin-top:8px;
+      color:#374151
+    } 
+    .pron{
+      font-weight:600;
+      color:var(--accent)
+    } 
+ 
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:13px
+    } 
+ 
+    @media (max-width:640px){
+      .card{flex-direction:column}
+      .word{width:auto}
+    } 
+
+    /* New Word Section Styling */
+    #addWordSection{
+      background:white;
+      padding:16px;
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom:18px
+    }
+    #addWordSection h2{
+      margin-top:0;
+      font-size:18px
+    }
+  </style> 
+</head> 
+<body> 
+  <div class="container"> 
+    <header> 
+      <div> 
+        <h1>Mini English Dictionary</h1> 
+        <p class="lead">Click the speaker to hear pronunciation (uses your browser's speech synthesizer).</p> 
+      </div> 
+    </header> 
+
+    <!-- Add New Word Section -->
+    <section id="addWordSection">
+      <h2>➕ Add New Word</h2>
+      <div style="display:grid;gap:10px;">
+        <input id="newWord" placeholder="Word (e.g., grateful)" class="search" />
+        <input id="newPos" placeholder="Part of speech (e.g., adjective)" class="search" />
+        <input id="newPron" placeholder="Pronunciation (e.g., /ˈɡreɪtfəl/)" class="search" />
+        <textarea id="newDef" placeholder="Definition..." class="search" style="height:60px;"></textarea>
+
+        <div id="examplesArea">
+          <input placeholder="Example 1" class="search exampleBox" />
+        </div>
+
+        <button id="addExampleBtn" class="play">➕ Add Example</button>
+        <button id="saveWordBtn" class="play" style="background:var(--accent);color:white;">💾 Save Word</button>
+      </div>
+    </section>
+ 
+    <div class="controls"> 
+      <input id="search" class="search" placeholder="Search word or example... (try: pleasant)" /> 
+      <button id="speakAll" class="play" title="Speak all visible words">🔊 Speak list</button> 
+    </div> 
+ 
+    <div id="list" class="list"></div> 
+ 
+    <footer> 
+      Tip: pronunciation comes from your device/browser using the Web Speech API.  
+      For best quality, try Chrome, Edge, or Firefox on a modern OS. 
+    </footer> 
+  </div> 
+ 
+  <script> 
+    // Data: words, definition, examples 
+    const DICT = [ 
+      {word:'delightful',pos:'adjective',pron:'/dɪˈlaɪtfəl/',def:'very pleasant, very enjoyable or attractive',examples:['Our new neighbours are delightful.','Thank you for a delightful evening.']}, 
+      {word:'blow',pos:'verb',pron:'/bloʊ/',def:'to move and make currents of air, or to be moved or make something move on a current of air',examples:['The letter blew away and I had to run after it.','A gale-force wind had blown the fence down.','The wind was blowing harder every minute.','I blew the dust off the books.','I wish you wouldn’t blow smoke in my face.']}, 
+      {word:'pleasant',pos:'adjective',pron:'/ˈplɛzənt/',def:'enjoyable, attractive, friendly, or easy to like',examples:['a pleasant climate/smile/person','a pleasant day/surprise',"Harold did his best to be pleasant to the old man.",'It was pleasant to sit down after standing for hours.']}, 
+      {word:'glance',pos:'verb',pron:'/ɡlæns/',def:'to give a quick short look',examples:['She glanced around the room to see who was there.','Kate glanced round the court hoping that nobody would recognize her.','He glanced up from his book as I passed.',"Could you glance over this letter and see if it's alright?",'I only had time to glance through the newspaper headlines.']}, 
+      {word:'stumble',pos:'verb',pron:'/ˈstʌmbl/',def:'to step awkwardly while walking or running and fall or begin to fall',examples:['Running along the beach, she stumbled on a log and fell on the sand.',"In the final straight Meyers stumbled, and although he didn't fall it was enough to lose him first place."]}, 
+      {word:'beneath',pos:'preposition',pron:'/bɪˈniːθ/',def:'in or to a lower position than someone or something, under someone or something',examples:['Jaime hid the letter beneath a pile of papers.','We huddled together for warmth beneath the blankets.','After weeks at sea, it was wonderful to feel firm ground beneath our feet once more.','Emma was so tired and hungry that her legs were beginning to give way beneath her (= she was about to fall over).']} 
+    ]; 
+ 
+    const listEl = document.getElementById('list'); 
+    const searchEl = document.getElementById('search'); 
+    const speakAllBtn = document.getElementById('speakAll'); 
+ 
+    function render(filter=''){ 
+      listEl.innerHTML = ''; 
+      const q = filter.trim().toLowerCase(); 
+      const items = DICT.filter(item => { 
+        if(!q) return true; 
+        if(item.word.toLowerCase().includes(q)) return true; 
+        if(item.def.toLowerCase().includes(q)) return true; 
+        if(item.examples.join(' ').toLowerCase().includes(q)) return true; 
+        return false; 
+      }); 
+ 
+      if(items.length===0){ 
+        listEl.innerHTML = '<div style="color:var(--muted);padding:18px;background:#fff;border-radius:12px">No results — try another search.</div>'; 
+        return; 
+      } 
+ 
+      for(const item of items){ 
+        const card = document.createElement('div'); 
+        card.className = 'card'; 
+ 
+        const left = document.createElement('div'); 
+        left.className = 'word'; 
+        left.innerHTML = `<h2>${item.word}</h2><div class="meta">${item.pos||''} <span class="pron">${item.pron||''}</span></div>`; 
+ 
+        const def = document.createElement('div'); 
+        def.className = 'definition'; 
+        def.innerHTML = `<div>${item.def}</div>`; 
+ 
+        const exWrap = document.createElement('div'); 
+        exWrap.className = 'example'; 
+        exWrap.innerHTML = item.examples.map(e => `<div>• ${e}</div>`).join(''); 
+ 
+        const actions = document.createElement('div'); 
+        actions.className = 'actions'; 
+ 
+        const playWord = document.createElement('button'); 
+        playWord.className = 'play'; 
+        playWord.title = 'Play pronunciation of the word'; 
+        playWord.innerText = '🔊 Word'; 
+        playWord.onclick = () => speak(item.word); 
+ 
+        const playExample = document.createElement('button'); 
+        playExample.className = 'play'; 
+        playExample.title = 'Read examples aloud'; 
+        playExample.innerText = '🔉 Examples'; 
+        playExample.onclick = () => speak(item.examples.join('. ')); 
+ 
+        actions.appendChild(playWord); 
+        actions.appendChild(playExample); 
+ 
+        def.appendChild(actions); 
+        def.appendChild(exWrap); 
+ 
+        card.appendChild(left); 
+        card.appendChild(def); 
+        listEl.appendChild(card); 
+      } 
+    } 
+ 
+    function speak(text){ 
+      if(!('speechSynthesis' in window)){ 
+        alert('Sorry — your browser does not support speech synthesis.'); 
+        return; 
+      } 
+      const utter = new SpeechSynthesisUtterance(text); 
+      const voices = window.speechSynthesis.getVoices(); 
+      if(voices && voices.length){ 
+        const v = voices.find(v=>v.lang.startsWith('en')) || voices[0]; 
+        if(v) utter.voice = v; 
+      } 
+      window.speechSynthesis.cancel(); 
+      window.speechSynthesis.speak(utter); 
+    } 
+ 
+    async function speakVisible(){ 
+      const visibleWords = Array.from(listEl.querySelectorAll('.card h2')).map(h=>h.textContent); 
+      for(const w of visibleWords){ 
+        speak(w); 
+        await waitForSpeechEnd(); 
+      } 
+    } 
+ 
+    function waitForSpeechEnd(){ 
+      return new Promise(res=>{ 
+        const id = setInterval(()=>{ 
+          if(!window.speechSynthesis.speaking){ 
+            clearInterval(id); 
+            setTimeout(res, 120); 
+          } 
+        },120); 
+      }); 
+    } 
+
+    // ---------- New Word Feature ----------
+    const addExampleBtn = document.getElementById('addExampleBtn');
+    const examplesArea = document.getElementById('examplesArea');
+    const saveWordBtn = document.getElementById('saveWordBtn');
+
+    addExampleBtn.addEventListener('click', () => {
+      const count = examplesArea.querySelectorAll('.exampleBox').length;
+      if (count >= 5) {
+        alert('You can only add up to 5 examples.');
+        return;
+      }
+      const input = document.createElement('input');
+      input.placeholder = `Example ${count + 1}`;
+      input.className = 'search exampleBox';
+      examplesArea.appendChild(input);
+    });
+
+    saveWordBtn.addEventListener('click', () => {
+      const word = document.getElementById('newWord').value.trim();
+      const pos = document.getElementById('newPos').value.trim();
+      const pron = document.getElementById('newPron').value.trim();
+      const def = document.getElementById('newDef').value.trim();
+      const examples = Array.from(examplesArea.querySelectorAll('.exampleBox'))
+                            .map(e => e.value.trim())
+                            .filter(e => e);
+
+      if (!word || !def) {
+        alert('Please enter at least a word and definition.');
+        return;
+      }
+
+      DICT.unshift({ word, pos, pron, def, examples });
+      render();
+
+      // clear inputs
+      document.getElementById('newWord').value = '';
+      document.getElementById('newPos').value = '';
+      document.getElementById('newPron').value = '';
+      document.getElementById('newDef').value = '';
+      examplesArea.innerHTML = '<input placeholder="Example 1" class="search exampleBox" />';
+    });
+
+    // ---------- Initialization ----------
+    render(); 
+    searchEl.addEventListener('input', e=>render(e.target.value)); 
+    speakAllBtn.addEventListener('click', ()=>speakVisible()); 
+    if('speechSynthesis' in window){ 
+      window.speechSynthesis.onvoiceschanged = ()=>{}; 
+    } 
+  </script> 
+</body> 
+</html>
