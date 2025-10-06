@@ -1,328 +1,611 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
-  <meta charset="utf-8" /> 
-  <meta name="viewport" content="width=device-width,initial-scale=1" /> 
-  <title>Mini English Dictionary — Pronunciation + Examples</title> 
-  <style> 
-    :root{
-      --bg:#f7f8fb;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --accent:#2563eb
-    } 
-    body{
-      font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
-      background:var(--bg);
-      margin:0;
-      padding:28px;
-      color:#111
-    } 
-    .container{
-      max-width:900px;
-      margin:0 auto
-    } 
-    header{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-bottom:18px
-    } 
-    h1{
-      font-size:20px;
-      margin:0
-    } 
-    p.lead{
-      margin:0;
-      color:var(--muted)
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini English Dictionary — Pronunciation + Examples</title>
+  <style>
+    :root{--bg:#f7f8fb;--card:#ffffff;--muted:#6b7280;--accent:#2563eb;--success:#10b981;--danger:#ef4444}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial; background:var(--bg);margin:0;padding:28px;color:#111}
+    .container{max-width:900px;margin:0 auto}
+    header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted)}
+
+    .controls{display:flex;gap:8px;align-items:center;margin:18px 0}
+    input.search{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #e6e9ef;background:white}
+    .list{display:grid;grid-template-columns:1fr;gap:12px}
+
+    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06);display:flex;gap:12px;align-items:flex-start;position:relative}
+    .word{width:140px;flex-shrink:0}
+    .word h2{margin:0;font-size:18px}
+    .meta{color:var(--muted);font-size:13px}
+    .actions{margin-top:8px;display:flex;gap:8px}
+    button.play{background:transparent;border:1px solid #e6e9ef;padding:6px 8px;border-radius:8px;cursor:pointer}
+    .definition{flex:1}
+    .example{margin-top:8px;color:#374151}
+    .pron{font-weight:600;color:var(--accent)}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+
+    /* Add Word Form Styles */
+    .add-word-section {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+      margin-bottom: 24px;
     }
- 
-    .controls{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      margin:18px 0
-    } 
-    input.search{
-      flex:1;
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid #e6e9ef;
-      background:white
-    } 
-    .list{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px
-    } 
- 
-    .card{
-      background:var(--card);
-      padding:14px;
-      border-radius:12px;
-      box-shadow:0 6px 18px rgba(16,24,40,0.06);
-      display:flex;
-      gap:12px;
-      align-items:flex-start
-    } 
-    .word{
-      width:140px;
-      flex-shrink:0
-    } 
-    .word h2{
-      margin:0;
-      font-size:18px
-    } 
-    .meta{
-      color:var(--muted);
-      font-size:13px
-    } 
-    .actions{
-      margin-top:8px;
-      display:flex;
-      gap:8px
-    } 
-    button.play{
-      background:transparent;
-      border:1px solid #e6e9ef;
-      padding:6px 8px;
-      border-radius:8px;
-      cursor:pointer
-    } 
-    .definition{
-      flex:1
-    } 
-    .example{
-      margin-top:8px;
-      color:#374151
-    } 
-    .pron{
-      font-weight:600;
-      color:var(--accent)
-    } 
- 
-    footer{
-      margin-top:18px;
-      color:var(--muted);
-      font-size:13px
-    } 
- 
+    
+    .add-word-section h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #e6e9ef;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .examples-list {
+      margin-top: 8px;
+    }
+    
+    .example-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .example-item input {
+      flex: 1;
+    }
+    
+    .example-item button {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 18px;
+      margin-left: 8px;
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .example-item button:hover {
+      background: #fef2f2;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    
+    .delete-btn:hover {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .toast.success {
+      background: var(--success);
+    }
+    
+    .toast.error {
+      background: var(--danger);
+    }
+
     @media (max-width:640px){
-      .card{flex-direction:column}
-      .word{width:auto}
-    } 
-
-    /* New Word Section Styling */
-    #addWordSection{
-      background:white;
-      padding:16px;
-      border-radius:12px;
-      box-shadow:0 4px 10px rgba(0,0,0,0.05);
-      margin-bottom:18px
+      .card{flex-direction:column}.word{width:auto}
+      .form-actions { flex-direction: column; }
     }
-    #addWordSection h2{
-      margin-top:0;
-      font-size:18px
-    }
-  </style> 
-</head> 
-<body> 
-  <div class="container"> 
-    <header> 
-      <div> 
-        <h1>Mini English Dictionary</h1> 
-        <p class="lead">Click the speaker to hear pronunciation (uses your browser's speech synthesizer).</p> 
-      </div> 
-    </header> 
-
-    <!-- Add New Word Section -->
-    <section id="addWordSection">
-      <h2>➕ Add New Word</h2>
-      <div style="display:grid;gap:10px;">
-        <input id="newWord" placeholder="Word (e.g., grateful)" class="search" />
-        <input id="newPos" placeholder="Part of speech (e.g., adjective)" class="search" />
-        <input id="newPron" placeholder="Pronunciation (e.g., /ˈɡreɪtfəl/)" class="search" />
-        <textarea id="newDef" placeholder="Definition..." class="search" style="height:60px;"></textarea>
-
-        <div id="examplesArea">
-          <input placeholder="Example 1" class="search exampleBox" />
-        </div>
-
-        <button id="addExampleBtn" class="play">➕ Add Example</button>
-        <button id="saveWordBtn" class="play" style="background:var(--accent);color:white;">💾 Save Word</button>
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Mini English Dictionary</h1>
+        <p class="lead">Click the speaker to hear the pronunciation (uses your browser's speech synthesizer).</p>
       </div>
+    </header>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Add Word Form -->
+    <section class="add-word-section">
+      <h2>Add New Word</h2>
+      <form id="addWordForm">
+        <div class="form-group">
+          <label for="wordInput">Enter word</label>
+          <input type="text" id="wordInput" placeholder="Word" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="posSelect">Part of speech</label>
+          <select id="posSelect" class="form-control">
+            <option value="noun">noun</option>
+            <option value="verb">verb</option>
+            <option value="adjective">adjective</option>
+            <option value="adverb">adverb</option>
+            <option value="preposition">preposition</option>
+            <option value="conjunction">conjunction</option>
+            <option value="interjection">interjection</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="pronInput">Pronunciation</label>
+          <input type="text" id="pronInput" placeholder="/prəˌnʌn.siˈeɪ.ʃən/">
+        </div>
+        
+        <div class="form-group">
+          <label for="defInput">Enter description</label>
+          <textarea id="defInput" placeholder="Definition" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Examples:</label>
+          <div id="examplesList" class="examples-list">
+            <!-- Example items will be added here dynamically -->
+          </div>
+          <button type="button" id="addExampleBtn" class="btn btn-secondary">+ Add Example</button>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add Word</button>
+          <button type="button" id="clearFormBtn" class="btn btn-secondary">Clear Form</button>
+          <button type="button" id="clearAllBtn" class="btn btn-danger">Clear All Custom Words</button>
+        </div>
+      </form>
     </section>
- 
-    <div class="controls"> 
-      <input id="search" class="search" placeholder="Search word or example... (try: pleasant)" /> 
-      <button id="speakAll" class="play" title="Speak all visible words">🔊 Speak list</button> 
-    </div> 
- 
-    <div id="list" class="list"></div> 
- 
-    <footer> 
-      Tip: pronunciation comes from your device/browser using the Web Speech API.  
-      For best quality, try Chrome, Edge, or Firefox on a modern OS. 
-    </footer> 
-  </div> 
- 
-  <script> 
-    // Data: words, definition, examples 
-    const DICT = [ 
-      {word:'delightful',pos:'adjective',pron:'/dɪˈlaɪtfəl/',def:'very pleasant, very enjoyable or attractive',examples:['Our new neighbours are delightful.','Thank you for a delightful evening.']}, 
-      {word:'blow',pos:'verb',pron:'/bloʊ/',def:'to move and make currents of air, or to be moved or make something move on a current of air',examples:['The letter blew away and I had to run after it.','A gale-force wind had blown the fence down.','The wind was blowing harder every minute.','I blew the dust off the books.','I wish you wouldn’t blow smoke in my face.']}, 
-      {word:'pleasant',pos:'adjective',pron:'/ˈplɛzənt/',def:'enjoyable, attractive, friendly, or easy to like',examples:['a pleasant climate/smile/person','a pleasant day/surprise',"Harold did his best to be pleasant to the old man.",'It was pleasant to sit down after standing for hours.']}, 
-      {word:'glance',pos:'verb',pron:'/ɡlæns/',def:'to give a quick short look',examples:['She glanced around the room to see who was there.','Kate glanced round the court hoping that nobody would recognize her.','He glanced up from his book as I passed.',"Could you glance over this letter and see if it's alright?",'I only had time to glance through the newspaper headlines.']}, 
-      {word:'stumble',pos:'verb',pron:'/ˈstʌmbl/',def:'to step awkwardly while walking or running and fall or begin to fall',examples:['Running along the beach, she stumbled on a log and fell on the sand.',"In the final straight Meyers stumbled, and although he didn't fall it was enough to lose him first place."]}, 
-      {word:'beneath',pos:'preposition',pron:'/bɪˈniːθ/',def:'in or to a lower position than someone or something, under someone or something',examples:['Jaime hid the letter beneath a pile of papers.','We huddled together for warmth beneath the blankets.','After weeks at sea, it was wonderful to feel firm ground beneath our feet once more.','Emma was so tired and hungry that her legs were beginning to give way beneath her (= she was about to fall over).']} 
-    ]; 
- 
-    const listEl = document.getElementById('list'); 
-    const searchEl = document.getElementById('search'); 
-    const speakAllBtn = document.getElementById('speakAll'); 
- 
-    function render(filter=''){ 
-      listEl.innerHTML = ''; 
-      const q = filter.trim().toLowerCase(); 
-      const items = DICT.filter(item => { 
-        if(!q) return true; 
-        if(item.word.toLowerCase().includes(q)) return true; 
-        if(item.def.toLowerCase().includes(q)) return true; 
-        if(item.examples.join(' ').toLowerCase().includes(q)) return true; 
-        return false; 
-      }); 
- 
-      if(items.length===0){ 
-        listEl.innerHTML = '<div style="color:var(--muted);padding:18px;background:#fff;border-radius:12px">No results — try another search.</div>'; 
-        return; 
-      } 
- 
-      for(const item of items){ 
-        const card = document.createElement('div'); 
-        card.className = 'card'; 
- 
-        const left = document.createElement('div'); 
-        left.className = 'word'; 
-        left.innerHTML = `<h2>${item.word}</h2><div class="meta">${item.pos||''} <span class="pron">${item.pron||''}</span></div>`; 
- 
-        const def = document.createElement('div'); 
-        def.className = 'definition'; 
-        def.innerHTML = `<div>${item.def}</div>`; 
- 
-        const exWrap = document.createElement('div'); 
-        exWrap.className = 'example'; 
-        exWrap.innerHTML = item.examples.map(e => `<div>• ${e}</div>`).join(''); 
- 
-        const actions = document.createElement('div'); 
-        actions.className = 'actions'; 
- 
-        const playWord = document.createElement('button'); 
-        playWord.className = 'play'; 
-        playWord.title = 'Play pronunciation of the word'; 
-        playWord.innerText = '🔊 Word'; 
-        playWord.onclick = () => speak(item.word); 
- 
-        const playExample = document.createElement('button'); 
-        playExample.className = 'play'; 
-        playExample.title = 'Read examples aloud'; 
-        playExample.innerText = '🔉 Examples'; 
-        playExample.onclick = () => speak(item.examples.join('. ')); 
- 
-        actions.appendChild(playWord); 
-        actions.appendChild(playExample); 
- 
-        def.appendChild(actions); 
-        def.appendChild(exWrap); 
- 
-        card.appendChild(left); 
-        card.appendChild(def); 
-        listEl.appendChild(card); 
-      } 
-    } 
- 
-    function speak(text){ 
-      if(!('speechSynthesis' in window)){ 
-        alert('Sorry — your browser does not support speech synthesis.'); 
-        return; 
-      } 
-      const utter = new SpeechSynthesisUtterance(text); 
-      const voices = window.speechSynthesis.getVoices(); 
-      if(voices && voices.length){ 
-        const v = voices.find(v=>v.lang.startsWith('en')) || voices[0]; 
-        if(v) utter.voice = v; 
-      } 
-      window.speechSynthesis.cancel(); 
-      window.speechSynthesis.speak(utter); 
-    } 
- 
-    async function speakVisible(){ 
-      const visibleWords = Array.from(listEl.querySelectorAll('.card h2')).map(h=>h.textContent); 
-      for(const w of visibleWords){ 
-        speak(w); 
-        await waitForSpeechEnd(); 
-      } 
-    } 
- 
-    function waitForSpeechEnd(){ 
-      return new Promise(res=>{ 
-        const id = setInterval(()=>{ 
-          if(!window.speechSynthesis.speaking){ 
-            clearInterval(id); 
-            setTimeout(res, 120); 
-          } 
-        },120); 
-      }); 
-    } 
 
-    // ---------- New Word Feature ----------
+    <div class="controls">
+      <input id="search" class="search" placeholder="Search word or example... (try: pleasant)" />
+      <button id="speakAll" class="play" title="Speak all visible words">🔊 Speak list</button>
+    </div>
+
+    <div id="list" class="list"></div>
+
+    <footer>
+      Tip: the pronunciation comes from your device/browser using the Web Speech API. For best quality try Chrome, Edge, or Firefox with a modern OS.
+      <br>Your custom words are saved in your browser's local storage.
+    </footer>
+  </div>
+
+  <script>
+    // Default dictionary data
+    const DEFAULT_DICT = [
+      {
+        word: 'delightful',
+        pos: 'adjective',
+        pron: '/dɪˈlaɪtfəl/',
+        def: 'very pleasant, very enjoyable or attractive',
+        examples: [
+          'Our new neighbours are delightful.',
+          'Thank you for a delightful evening.'
+        ]
+      },
+      {
+        word: 'blow',
+        pos: 'verb',
+        pron: '/bloʊ/',
+        def: 'to move and make currents of air, or to be moved or make something move on a current of air',
+        examples: [
+          'The letter blew away and I had to run after it.',
+          'A gale-force wind had blown the fence down.',
+          'The wind was blowing harder every minute.',
+          'I blew the dust off the books.',
+          "I wish you wouldn't blow smoke in my face."
+        ]
+      },
+      {
+        word: 'pleasant',
+        pos: 'adjective',
+        pron: '/ˈplɛzənt/',
+        def: 'enjoyable, attractive, friendly, or easy to like',
+        examples: [
+          'a pleasant climate/smile/person',
+          'a pleasant day/surprise',
+          "Harold did his best to be pleasant to the old man.",
+          'It was pleasant to sit down after standing for hours.'
+        ]
+      },
+      {
+        word: 'glance',
+        pos: 'verb',
+        pron: '/ɡlæns/',
+        def: 'to give a quick short look',
+        examples: [
+          'She glanced around the room to see who was there.',
+          'Kate glanced round the court hoping that nobody would recognize her.',
+          'He glanced up from his book as I passed.',
+          "Could you glance over this letter and see if it's alright?",
+          'I only had time to glance through the newspaper headlines.'
+        ]
+      },
+      {
+        word: 'stumble',
+        pos: 'verb',
+        pron: '/ˈstʌmbl/',
+        def: 'to step awkwardly while walking or running and fall or begin to fall',
+        examples: [
+          'Running along the beach, she stumbled on a log and fell on the sand.',
+          "In the final straight Meyers stumbled, and although he didn't fall it was enough to lose him first place."
+        ]
+      },
+      {
+        word: 'beneath',
+        pos: 'preposition',
+        pron: '/bɪˈniːθ/',
+        def: 'in or to a lower position than someone or something, under someone or something',
+        examples: [
+          'Jaime hid the letter beneath a pile of papers.',
+          'We huddled together for warmth beneath the blankets.',
+          'After weeks at sea, it was wonderful to feel firm ground beneath our feet once more.',
+          'Emma was so tired and hungry that her legs were beginning to give way beneath her (= she was about to fall over).'
+        ]
+      }
+    ];
+
+    // Load dictionary from localStorage or use default
+    function loadDictionary() {
+      const savedDict = localStorage.getItem('englishDictionary');
+      if (savedDict) {
+        return JSON.parse(savedDict);
+      } else {
+        // Save default dictionary to localStorage
+        saveDictionary(DEFAULT_DICT);
+        return DEFAULT_DICT;
+      }
+    }
+
+    // Save dictionary to localStorage
+    function saveDictionary(dict) {
+      localStorage.setItem('englishDictionary', JSON.stringify(dict));
+    }
+
+    // Initialize dictionary
+    let DICT = loadDictionary();
+
+    const listEl = document.getElementById('list');
+    const searchEl = document.getElementById('search');
+    const speakAllBtn = document.getElementById('speakAll');
+    const addWordForm = document.getElementById('addWordForm');
     const addExampleBtn = document.getElementById('addExampleBtn');
-    const examplesArea = document.getElementById('examplesArea');
-    const saveWordBtn = document.getElementById('saveWordBtn');
+    const clearFormBtn = document.getElementById('clearFormBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const examplesList = document.getElementById('examplesList');
+    const toastEl = document.getElementById('toast');
 
-    addExampleBtn.addEventListener('click', () => {
-      const count = examplesArea.querySelectorAll('.exampleBox').length;
-      if (count >= 5) {
-        alert('You can only add up to 5 examples.');
-        return;
-      }
-      const input = document.createElement('input');
-      input.placeholder = `Example ${count + 1}`;
-      input.className = 'search exampleBox';
-      examplesArea.appendChild(input);
-    });
+    // Initialize examples list with one empty example
+    let exampleCount = 0;
+    addExample();
 
-    saveWordBtn.addEventListener('click', () => {
-      const word = document.getElementById('newWord').value.trim();
-      const pos = document.getElementById('newPos').value.trim();
-      const pron = document.getElementById('newPron').value.trim();
-      const def = document.getElementById('newDef').value.trim();
-      const examples = Array.from(examplesArea.querySelectorAll('.exampleBox'))
-                            .map(e => e.value.trim())
-                            .filter(e => e);
+    function render(filter=''){
+      listEl.innerHTML = '';
+      const q = filter.trim().toLowerCase();
+      const items = DICT.filter(item => {
+        if(!q) return true;
+        if(item.word.toLowerCase().includes(q)) return true;
+        if(item.def.toLowerCase().includes(q)) return true;
+        if(item.examples.join(' ').toLowerCase().includes(q)) return true;
+        return false;
+      });
 
-      if (!word || !def) {
-        alert('Please enter at least a word and definition.');
+      if(items.length===0){
+        listEl.innerHTML = '<div style="color:var(--muted);padding:18px;background:#fff;border-radius:12px">No results — try another search.</div>';
         return;
       }
 
-      DICT.unshift({ word, pos, pron, def, examples });
-      render();
+      for(const item of items){
+        const card = document.createElement('div');
+        card.className = 'card';
 
-      // clear inputs
-      document.getElementById('newWord').value = '';
-      document.getElementById('newPos').value = '';
-      document.getElementById('newPron').value = '';
-      document.getElementById('newDef').value = '';
-      examplesArea.innerHTML = '<input placeholder="Example 1" class="search exampleBox" />';
-    });
+        const left = document.createElement('div');
+        left.className = 'word';
+        left.innerHTML = `<h2>${item.word}</h2><div class="meta">${item.pos} <span class="pron">${item.pron}</span></div>`;
 
-    // ---------- Initialization ----------
-    render(); 
-    searchEl.addEventListener('input', e=>render(e.target.value)); 
-    speakAllBtn.addEventListener('click', ()=>speakVisible()); 
-    if('speechSynthesis' in window){ 
-      window.speechSynthesis.onvoiceschanged = ()=>{}; 
-    } 
-  </script> 
-</body> 
+        const def = document.createElement('div');
+        def.className = 'definition';
+        def.innerHTML = `<div>${item.def}</div>`;
+
+        const exWrap = document.createElement('div');
+        exWrap.className = 'example';
+        exWrap.innerHTML = item.examples.map(e => `<div>• ${e}</div>`).join('');
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const playWord = document.createElement('button');
+        playWord.className = 'play';
+        playWord.title = 'Play pronunciation of the word';
+        playWord.innerText = '🔊 Word';
+        playWord.onclick = () => speak(item.word);
+
+        const playExample = document.createElement('button');
+        playExample.className = 'play';
+        playExample.title = 'Read examples aloud';
+        playExample.innerText = '🔉 Examples';
+        playExample.onclick = () => speak(item.examples.join('. '));
+
+        actions.appendChild(playWord);
+        actions.appendChild(playExample);
+
+        def.appendChild(actions);
+        def.appendChild(exWrap);
+
+        card.appendChild(left);
+        card.appendChild(def);
+
+        // Add delete button for custom words (not in default dictionary)
+        const isCustomWord = !DEFAULT_DICT.some(defaultItem => defaultItem.word === item.word);
+        if (isCustomWord) {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'delete-btn';
+          deleteBtn.title = 'Delete this word';
+          deleteBtn.innerHTML = '×';
+          deleteBtn.onclick = () => deleteWord(item.word);
+          card.appendChild(deleteBtn);
+        }
+
+        listEl.appendChild(card);
+      }
+    }
+
+    // Speak text using Web Speech API
+    function speak(text){
+      if(!('speechSynthesis' in window)){
+        alert('Sorry — your browser does not support speech synthesis.');
+        return;
+      }
+      const utter = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      if(voices && voices.length){
+        const v = voices.find(v=>v.lang.startsWith('en')) || voices[0];
+        if(v) utter.voice = v;
+      }
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Speak all visible words in sequence
+    async function speakVisible(){
+      const visibleWords = Array.from(listEl.querySelectorAll('.card h2')).map(h=>h.textContent);
+      for(const w of visibleWords){
+        speak(w);
+        await waitForSpeechEnd();
+      }
+    }
+
+    function waitForSpeechEnd(){
+      return new Promise(res=>{
+        const id = setInterval(()=>{
+          if(!window.speechSynthesis.speaking){
+            clearInterval(id);
+            setTimeout(res, 120);
+          }
+        },120);
+      });
+    }
+
+    // Add example field
+    function addExample() {
+      exampleCount++;
+      const exampleItem = document.createElement('div');
+      exampleItem.className = 'example-item';
+      exampleItem.innerHTML = `
+        <input type="text" class="example-input" placeholder="Enter example" id="example-${exampleCount}">
+        <button type="button" class="remove-example" data-id="${exampleCount}">×</button>
+      `;
+      examplesList.appendChild(exampleItem);
+      
+      exampleItem.querySelector('.remove-example').addEventListener('click', function() {
+        if(examplesList.children.length > 1) {
+          examplesList.removeChild(exampleItem);
+        }
+      });
+    }
+
+    // Clear form
+    function clearForm() {
+      document.getElementById('wordInput').value = '';
+      document.getElementById('posSelect').value = 'noun';
+      document.getElementById('pronInput').value = '';
+      document.getElementById('defInput').value = '';
+      
+      examplesList.innerHTML = '';
+      exampleCount = 0;
+      addExample();
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      toastEl.textContent = message;
+      toastEl.className = `toast ${type}`;
+      toastEl.classList.add('show');
+      
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 3000);
+    }
+
+    // Add word to dictionary
+    function addWord(event) {
+      event.preventDefault();
+      
+      const word = document.getElementById('wordInput').value.trim();
+      const pos = document.getElementById('posSelect').value;
+      const pron = document.getElementById('pronInput').value.trim();
+      const def = document.getElementById('defInput').value.trim();
+      
+      // Get examples
+      const examples = [];
+      const exampleInputs = examplesList.querySelectorAll('.example-input');
+      exampleInputs.forEach(input => {
+        if(input.value.trim()) {
+          examples.push(input.value.trim());
+        }
+      });
+      
+      // Validate
+      if(!word || !def) {
+        showToast('Please fill in at least the word and definition.', 'error');
+        return;
+      }
+      
+      // Check if word already exists
+      if(DICT.some(item => item.word.toLowerCase() === word.toLowerCase())) {
+        showToast('This word already exists in the dictionary.', 'error');
+        return;
+      }
+      
+      // Add to dictionary
+      const newWord = {
+        word: word,
+        pos: pos,
+        pron: pron || `/${word}/`,
+        def: def,
+        examples: examples.length > 0 ? examples : ['No examples provided.']
+      };
+      
+      DICT.push(newWord);
+      saveDictionary(DICT);
+      
+      // Clear form
+      clearForm();
+      
+      // Re-render dictionary
+      render(searchEl.value);
+      
+      showToast(`"${word}" added to dictionary successfully!`);
+      
+      // Scroll to the new word
+      setTimeout(() => {
+        const newWordElement = Array.from(listEl.querySelectorAll('.card h2'))
+          .find(h2 => h2.textContent === word);
+        if(newWordElement) {
+          newWordElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+
+    // Delete word from dictionary
+    function deleteWord(word) {
+      if (confirm(`Are you sure you want to delete "${word}" from the dictionary?`)) {
+        DICT = DICT.filter(item => item.word !== word);
+        saveDictionary(DICT);
+        render(searchEl.value);
+        showToast(`"${word}" has been deleted.`);
+      }
+    }
+
+    // Clear all custom words
+    function clearAllCustomWords() {
+      if (confirm('Are you sure you want to delete all custom words? This cannot be undone.')) {
+        DICT = DEFAULT_DICT.slice(); // Reset to default dictionary
+        saveDictionary(DICT);
+        render(searchEl.value);
+        showToast('All custom words have been deleted.');
+      }
+    }
+
+    // Event listeners
+    addExampleBtn.addEventListener('click', addExample);
+    clearFormBtn.addEventListener('click', clearForm);
+    clearAllBtn.addEventListener('click', clearAllCustomWords);
+    addWordForm.addEventListener('submit', addWord);
+
+    // Initialize
+    render();
+
+    searchEl.addEventListener('input', e=>render(e.target.value));
+    speakAllBtn.addEventListener('click', ()=>speakVisible());
+
+    // Ensure voices loaded
+    if('speechSynthesis' in window){
+      window.speechSynthesis.onvoiceschanged = ()=>{};
+    }
+  </script>
+</body>
 </html>
