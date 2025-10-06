@@ -5,12 +5,20 @@ const speakAllBtn = document.getElementById('speakAll');
 const addWordBtn = document.getElementById('addWordBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 
-// Load dictionary from JSON file
+// Load dictionary from localStorage or JSON
 async function loadDictionary() {
+  const saved = localStorage.getItem('myDictionary');
+  if (saved) {
+    dictionary = JSON.parse(saved);
+    renderDictionary();
+    return;
+  }
+
   try {
     const res = await fetch('dictionary.json');
     const data = await res.json();
     dictionary = data;
+    saveToLocal();
     renderDictionary();
   } catch (err) {
     console.error('Error loading dictionary:', err);
@@ -18,7 +26,7 @@ async function loadDictionary() {
   }
 }
 
-// Render visible words
+// Render words
 function renderDictionary(filter = '') {
   const q = filter.trim().toLowerCase();
   const filtered = dictionary.filter(item =>
@@ -35,7 +43,7 @@ function renderDictionary(filter = '') {
   listEl.innerHTML = filtered.map(item => `
     <div class="card">
       <div class="word">${item.word}</div>
-      <div class="meta">${item.pos} • <span>${item.pron}</span></div>
+      <div class="meta">${item.pos || ''} • <span>${item.pron || ''}</span></div>
       <div>${item.def}</div>
       <div class="example">${item.examples.map(e => `• ${e}`).join('<br>')}</div>
       <div class="actions" style="margin-top:8px;">
@@ -46,10 +54,10 @@ function renderDictionary(filter = '') {
   `).join('');
 }
 
-// Speech synthesis
+// Speak function
 function speak(text) {
   if (!('speechSynthesis' in window)) {
-    alert('Speech synthesis not supported in this browser.');
+    alert('Speech synthesis not supported.');
     return;
   }
   const utter = new SpeechSynthesisUtterance(text);
@@ -61,7 +69,6 @@ function speak(text) {
   window.speechSynthesis.speak(utter);
 }
 
-// Speak all visible words
 async function speakVisible() {
   const words = Array.from(listEl.querySelectorAll('.word')).map(w => w.textContent);
   for (const w of words) {
@@ -95,11 +102,26 @@ addWordBtn.onclick = () => {
   }
 
   dictionary.push({ word, pos, pron, def, examples });
+  saveToLocal();
   renderDictionary();
   alert(`✅ Word "${word}" added!`);
+  clearInputs();
 };
 
-// Save updated dictionary to a downloadable JSON
+function clearInputs() {
+  document.getElementById('wordInput').value = '';
+  document.getElementById('posInput').value = '';
+  document.getElementById('pronInput').value = '';
+  document.getElementById('defInput').value = '';
+  document.getElementById('examplesInput').value = '';
+}
+
+// Save to localStorage
+function saveToLocal() {
+  localStorage.setItem('myDictionary', JSON.stringify(dictionary));
+}
+
+// Download updated JSON
 downloadBtn.onclick = () => {
   const blob = new Blob([JSON.stringify(dictionary, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -113,5 +135,5 @@ downloadBtn.onclick = () => {
 searchEl.addEventListener('input', e => renderDictionary(e.target.value));
 speakAllBtn.addEventListener('click', speakVisible);
 
-// Init
+// Initialize
 loadDictionary();
