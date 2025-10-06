@@ -1,12 +1,22 @@
 [
   {
     "word": "delightful",
-    "desc": "very pleasant, attractive, or enjoyable.",
-    "examples": ["Our new neighbours are delightful.", "Thank you for a delightful evening."]
+    "pos": "adjective",
+    "pron": "/dɪˈlaɪtfəl/",
+    "def": "very pleasant, very enjoyable or attractive",
+    "examples": [
+      "Our new neighbours are delightful.",
+      "Thank you for a delightful evening."
+    ]
   },
   {
     "word": "pleasant",
-    "desc": "enjoyable, attractive, friendly, or easy to like.",
-    "examples": ["a pleasant climate/smile/person", "It was pleasant to sit down after standing for hours."]
+    "pos": "adjective",
+    "pron": "/ˈplɛzənt/",
+    "def": "enjoyable, attractive, friendly, or easy to like",
+    "examples": [
+      "a pleasant climate/smile/person",
+      "It was pleasant to sit down after standing for hours."
+    ]
   }
 ]
